@@ -7,6 +7,7 @@ export const Database = new Sequelize(
     'ytHqYuNNml19972941',
     {
         dialect: 'mysql',
-        host: 'ar1stokrat.beget.tech'
+        host: 'ar1stokrat.beget.tech',
+        port: 3306
     }
 );
