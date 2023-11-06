@@ -34,9 +34,9 @@ class BaseCommands {
                         payload: { action: 'deny_accept' },
                         color: Keyboard.NEGATIVE_COLOR
                     })
-                ]);
+                ]).inline().oneTime();
                 await context.send('Бип-буп-буп-биб?\nЯ нуждаюсь в установке.', {
-                    keyboard
+                    keyboard: keyboard.clone()
                 });
             } else {
                 await context.send('Ты не обладаешь такой силой, чтобы управлять мной ⛔');

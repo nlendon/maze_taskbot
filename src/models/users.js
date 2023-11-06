@@ -11,7 +11,8 @@ const Users = Database.define('users', {
     nick_name: DataTypes.STRING,
     points: DataTypes.INTEGER,
     warns: DataTypes.STRING,
-    is_active: DataTypes.BOOLEAN
+    is_active: DataTypes.BOOLEAN,
+    is_inspector: DataTypes.BOOLEAN
 });
 
 Users.beforeCreate((user) => {

@@ -6,11 +6,18 @@ import { CheckAvailability } from '../middlewares/check.availability.js';
 import { sendMessage } from '../middlewares/send.message.js';
 import OwnerCommands from '../controllers/owner.commands.js';
 import Owners from '../models/owners.js';
+import TaskCommands from '../controllers/task.commands.js';
+import GradeCommands from '../controllers/grade.commands.js';
+import { owner_id, owners_id } from '../common/constants.js';
+import UserCommands from '../controllers/user.commands.js';
+import SpellCommands from '../controllers/spell.commands.js';
 
 export const vk = new VK({
-    token: process.env.BOT_TOKEN,
+    token: process.env.BOT_TOKEN
 });
 export const { updates } = vk;
+
+export let grade_interval = null;
 
 updates.on('message_new', async (context) => {
     try {
@@ -76,6 +83,101 @@ updates.on('message_new', async (context) => {
                     await OwnerCommands.emergency_stop(context);
                     break;
                 }
+                case `${process.env.VK_NICK_COMMAND} /удалить_напоминалку`: {
+                    if (owners_id.find((owner) => owner === context.senderId)) {
+                        clearInterval(grade_interval);
+                        await context.send('Напоминалка была удалена! Перезапустите меня, чтобы вновь заработала она.');
+                    }
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /add_owner`: {
+                    await OwnerCommands.add_owner(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /del_owner`: {
+                    await OwnerCommands.delete_owner(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /задача`: {
+                    await TaskCommands.add_task(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /удалить_задачу`: {
+                    await TaskCommands.delete_task(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /задачи`: {
+                    await TaskCommands.get_all_tasks(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /мои_задачи`: {
+                    await TaskCommands.get_my_tasks(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /выполнить`: {
+                    await TaskCommands.complete_myTask(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /отклонить`: {
+                    await TaskCommands.cancel_myTask(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /добавить_запись`: {
+                    await GradeCommands.add_record(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /обновить_запись`: {
+                    await GradeCommands.update_record(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /удалить_запись`: {
+                    await GradeCommands.delete_record(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /записи`: {
+                    await GradeCommands.get_records(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /назначить`: {
+                    await GradeCommands.appoint_toGrade(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /разжаловать`: {
+                    await GradeCommands.remove_inspector(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /оценка`: {
+                    await GradeCommands.grade_structures(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /изменить_оценку`: {
+                    await GradeCommands.update_grade(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /удалить_оценку`: {
+                    await GradeCommands.delete_grade(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /оценки`: {
+                    await GradeCommands.get_grades(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /пользователи`: {
+                    await UserCommands.get_all_users(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /агуаменти`: {
+                    await context.reply('Вжууухххх....Твои трусы уже мокрые');
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /эванеско`: {
+                    await SpellCommands.evanesko(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /круцио`: {
+                    await SpellCommands.krucio(context);
+                    break;
+                }
             }
         }
     } catch (e) {
@@ -83,11 +185,14 @@ updates.on('message_new', async (context) => {
     }
 });
 
-
 try {
     updates.start().catch(console.error);
     ButtonEvent();
     console.log('Бот начал свою работу');
+    grade_interval = setInterval(async () => {
+        const now = new Date();
+        if (now.getDay() === 0) await GradeCommands.grade_reminder();
+    }, 24 * 60 * 60 * 1000);
 } catch (e) {
     console.log(e);
 }

@@ -126,7 +126,7 @@ class OwnerCommands {
                 message: 'Дефендо! Заклинание нельзя использовать против него!'
             });
             vk.api.messages.removeChatUser({
-                chat_id: 6,
+                chat_id: context.peerId - 2000000000,
                 user_id: UserRestructure(result[2])
             }).then(async () => {
                 await context.send('Пользователь был кикнут с беседы!');
@@ -167,6 +167,54 @@ class OwnerCommands {
             if (!setting) return 'Аварийного отключения нет для данной беседы!';
             await setting.destroy();
             return 'Бот возобновил свою работу!';
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    static add_owner = async (context) => {
+        try {
+            const is_owner = await Owners.findOne({ where: { vk_id: context.senderId, is_super: true } });
+            if (!is_owner) {
+                return await sendMessage({
+                    peerId: context.peerId,
+                    message: 'Пипирка твоя не выросла, чтобы использовать эту команду!'
+                });
+            }
+            const result = MessageRestructure(context);
+            if (!result[2]) return context.reply('Неправильно введен ID пользователя!');
+            const vk_id = UserRestructure(result[2]);
+            const vk_user = await vk.api.users.get({
+                user_ids: vk_id,
+                name_case: 'nom'
+            });
+            await Owners.create({
+                full_name: vk_user[0].first_name + ' ' + vk_user[0].last_name,
+                vk_id: vk_id,
+                is_super: false
+            });
+            await context.reply('Создатель был успешно добавлен, повелитель!');
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    static delete_owner = async (context) => {
+        try {
+            const is_owner = await Owners.findOne({ where: { vk_id: context.senderId, is_super: true } });
+            if (!is_owner) {
+                return await sendMessage({
+                    peerId: context.peerId,
+                    message: 'Пипирка твоя не выросла, чтобы использовать эту команду!'
+                });
+            }
+            const result = MessageRestructure(context);
+            if (!result[2]) return context.reply('Неправильно введен ID пользователя!');
+            const vk_id = UserRestructure(result[2]);
+            const temp_owner = await Owners.findOne({ where: { vk_id } });
+            if (!temp_owner) return context.reply('Создатель с таким ID не найден!');
+            await temp_owner.destroy();
+            context.reply('Создатель был успешно удален!');
         } catch (e) {
             console.log(e);
         }
