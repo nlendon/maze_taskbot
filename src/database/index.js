@@ -7,6 +7,6 @@ export const Database = new Sequelize(
     'F9T*g6ly',
     {
         dialect: 'mysql',
-        host: 'ar1stokrat.beget.tech'
+        host: 'localhost'
     }
 );
