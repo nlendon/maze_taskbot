@@ -10,7 +10,7 @@ const Tasks = Database.define('tasks', {
     performer: DataTypes.STRING,
     priority: DataTypes.ENUM(...priorities),
     estimation_time: DataTypes.STRING,
-    deadline: DataTypes.DATE,
+    deadline: DataTypes.STRING,
     points: DataTypes.INTEGER,
     is_done: { type: DataTypes.BOOLEAN, defaultValue: false },
     cancelable: { type: DataTypes.BOOLEAN(), defaultValue: false }

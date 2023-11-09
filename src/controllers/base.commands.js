@@ -65,6 +65,7 @@ class BaseCommands {
     static add_user = async (context) => {
         try {
             const result = MessageRestructure(context);
+            console.log(result);
             const is_role_valid = RoleValidator(result[3]);
             if (!is_role_valid) return await context.send('Неправильно введена должность!\n\nПример: @nlendon /запрос Nick_Lendon "Главный Следящий за Гетто"\n\nПолучить список всех должностей - @nlendon /roles');
             const is_exist = await Users.findOne({
@@ -127,6 +128,26 @@ class BaseCommands {
                 message += `${index + 1}. ${role}\n`;
             });
             await context.send(message);
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    static message_toAdmins = async (context) => {
+        try {
+            if (context.peerId >= 2000000000) return await context.send('Сообщение для Администрации можно отправить только через Личные сообщения Бота!');
+            const result = MessageRestructure(context);
+            const vk_user = await vk.api.users.get({
+                user_ids: context.senderId,
+                name_case: 'nom'
+            });
+            setTimeout(async () => {
+                await sendMessage({
+                    peerId: 2000000007,
+                    message: `Сообщение для Администрации от *id${context.senderId} (${vk_user[0].first_name + ' ' + vk_user[0].last_name}a)\n\n${result[1]}`
+                });
+            }, 2000);
+            await context.send('Сообщение успешно было доставлено!');
         } catch (e) {
             console.log(e);
         }

@@ -2,6 +2,7 @@ import Settings from '../models/settings.js';
 
 export const CheckAvailability = async (context) => {
     try {
+        if (context.peerId < 2000000000) return { status: 200 };
         const setting = await Settings.findOne({
             where: {
                 name: 'availability',

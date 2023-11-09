@@ -46,7 +46,13 @@ updates.on('message_new', async (context) => {
                     });
                 }
             }
-            switch (message[0] + ' ' + message[1]) {
+            if (context.peerId >= 2000000000) {
+                message = message[0] + ' ' + message[1];
+            } else if (context.peerId < 2000000000) {
+                message = process.env.VK_NICK_COMMAND + ' ' + message[0];
+                context.message.text = process.env.VK_NICK_COMMAND + ' ' + context.message.text
+            }
+            switch (message) {
                 case `${process.env.VK_NICK_COMMAND} /start`: {
                     await BaseCommands.start(context);
                     break;
@@ -61,6 +67,10 @@ updates.on('message_new', async (context) => {
                 }
                 case `${process.env.VK_NICK_COMMAND} /запрос`: {
                     await BaseCommands.add_user(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /сообщение`: {
+                    await BaseCommands.message_toAdmins(context);
                     break;
                 }
                 case `${process.env.VK_NICK_COMMAND} /create_command`: {
@@ -176,6 +186,14 @@ updates.on('message_new', async (context) => {
                 }
                 case `${process.env.VK_NICK_COMMAND} /круцио`: {
                     await SpellCommands.krucio(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /беседы`: {
+                    await UserCommands.get_dialogs(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /обращение`: {
+                    await UserCommands.message_toAll(context);
                     break;
                 }
             }

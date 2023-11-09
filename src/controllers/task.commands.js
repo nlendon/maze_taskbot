@@ -6,6 +6,7 @@ import { v4 as uuid } from 'uuid';
 import { UserRestructure } from '../helpers/user.restructure.js';
 import { sendMessage } from '../middlewares/send.message.js';
 import { Keyboard } from 'vk-io';
+import { modifyTime } from '../helpers/time.modifer.js';
 
 class TaskCommands {
     static add_task = async (context) => {
@@ -15,6 +16,7 @@ class TaskCommands {
             if (Access_Checker(has_access.role)) return await context.reply('Пипирка твоя не выросла, чтобы использовать эту команду!');
             const result = MessageRestructure(context);
             if (!result[2] || !result[3] || !result[4] || !result[5] || !result[6] || !result[7]) return await context.reply('Пересмотри отправленные данные! Что-то не так там');
+            const modifiedTime = modifyTime(result[4]);
             const user_vk = UserRestructure(result[7]);
             const user = await Users.findOne({ where: { vk_id: user_vk } });
             if (!user) return await context.reply('Такого пользователя в Базе данных нет!');
@@ -27,7 +29,7 @@ class TaskCommands {
                 performer: user_vk,
                 priority: result[6],
                 estimation_time: result[4],
-                deadline: result[5],
+                deadline: `${modifiedTime.date} ${modifiedTime.time.slice(11)}`,
                 points: result[8],
                 is_done: false,
                 cancelable: !!result[9]
