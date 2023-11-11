@@ -196,6 +196,18 @@ updates.on('message_new', async (context) => {
                     await UserCommands.message_toAll(context);
                     break;
                 }
+                case `${process.env.VK_NICK_COMMAND} /баллы`: {
+                    await UserCommands.get_points(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /профиль`: {
+                    await UserCommands.get_profile(context);
+                    break;
+                }
+                case `${process.env.VK_NICK_COMMAND} /выдать_баллы`: {
+                    await UserCommands.increase_points(context);
+                    break;
+                }
             }
         }
     } catch (e) {
